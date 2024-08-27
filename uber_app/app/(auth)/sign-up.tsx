@@ -1,20 +1,85 @@
 import { icons, images } from "@/constants";
-import { ScrollView, Text, View, Image } from "react-native";
+import { ScrollView, Text, View, Image, TextInput } from "react-native";
 import InputField from "../components/InputField";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CustomButton from "../components/CustomButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import OAuth from "../components/OAuth";
+import { useSignUp } from "@clerk/clerk-expo";
+import ReactNativeModal from "react-native-modal";
 
 const SignUp = () => {
+    const { isLoaded, signUp, setActive } = useSignUp();
+
     const [form, setForm] = useState({
         name: "",
         email: "",
         password: "",
     });
 
-    const onSignUpPress = async () => {
+    const [verification, setVerification] = useState({
+        state: "pending",
+        error: "",
+        code: "",
+    });
 
+    const otpInputs = useRef<Array<TextInput | null>>([]);
+
+    const handleOTPChange = (value: string, index: number) => {
+        const newCode = verification.code.split('');
+        newCode[index] = value;
+        setVerification({ ...verification, code: newCode.join('') });
+
+        if (value && index < otpInputs.current.length - 1) {
+            otpInputs.current[index + 1]?.focus();
+        }
+    };
+
+    const handleOTPKeyPress = (e: any, index: number) => {
+        if (e.nativeEvent.key === 'Backspace' && !verification.code[index] && index > 0) {
+            otpInputs.current[index - 1]?.focus();
+        }
+    };
+
+    const onSignUpPress = async () => {
+        if (!isLoaded) {
+            return
+        }
+
+        try {
+            await signUp.create({
+                emailAddress: form.email,
+                password: form.password,
+
+            })
+
+            await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+
+            setVerification({ ...verification, state: 'pending' })
+        } catch (err: any) {
+            console.error(JSON.stringify(err, null, 2))
+        }
+    }
+
+    const onPressVerify = async () => {
+        if (!isLoaded) return;
+
+        try {
+            const completeSignUp = await signUp.attemptEmailAddressVerification({
+                code: verification.code,
+            });
+
+            if (completeSignUp.status === 'complete') {
+                // TODO: Create a database user!
+                await setActive({ session: completeSignUp.createdSessionId });
+                setVerification({ ...verification, state: 'success' });
+                router.replace('/')
+            } else {
+                setVerification({ ...verification, state: 'failed', error: "Verification failed!" });
+            }
+        } catch (err: any) {
+            setVerification({ ...verification, state: 'failed', error: err.error[0].longMessage });
+        }
     }
 
     return (
@@ -60,6 +125,56 @@ const SignUp = () => {
                         </Link>
                     </View>
                 </View>
+
+                <ReactNativeModal isVisible={verification.state === 'pending'}>
+                    <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
+                        <Text className="text-2xl text-black font-bold">Verification</Text>
+                        <Text className="text-base text-gray-400 font-Jakarta mt-2">We've sent a verification code to </Text>
+                        <Text className="text-base text-black font-JakartaSemiBold">{form.email}</Text>
+
+                        <View className="flex flex-row mt-2">
+                            <Text className="text-base text-black font-JakartaSemiBold">Code</Text>
+                            <Image source={icons.lock} className="w-[20px] h-[20px] mt-0.5" />
+                        </View>
+
+                        {/* OTP Code input field */}
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                            {Array(6).fill('').map((_, index) => (
+                                <TextInput
+                                    key={index}
+                                    ref={(ref) => otpInputs.current[index] = ref}
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                        borderRadius: 5,
+                                        padding: 10,
+                                        textAlign: 'center',
+                                        fontSize: 18,
+                                        width: 40,
+                                    }}
+                                    keyboardType="numeric"
+                                    maxLength={1}
+                                    value={verification.code[index] || ''}
+                                    onChangeText={(value) => handleOTPChange(value, index)}
+                                    onKeyPress={(e) => handleOTPKeyPress(e, index)}
+                                />
+                            ))}
+                        </View>
+                        {verification.error && <Text className="text-red-500 mt-2">{verification.error}</Text>}
+                        <CustomButton title="Verify Email" onPress={onPressVerify} className="mt-8 bg-[#00CCBB]" />
+                    </View>
+                </ReactNativeModal>
+
+                <ReactNativeModal isVisible={verification.state === 'success'}>
+                    <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
+                        <Image
+                            source={images.check}
+                            className="w-[110px] h-[110px] mx-auto my-5"
+                        />
+                        <Text className="text-3xl text-black font-Bold text-center">Verified</Text>
+                        <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">You have successfully verified your account.</Text>
+                    </View>
+                </ReactNativeModal>
             </View>
         </ScrollView>
     );
