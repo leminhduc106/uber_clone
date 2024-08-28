@@ -1,5 +1,5 @@
 import { icons, images } from "@/constants";
-import { ScrollView, Text, View, Image, TextInput } from "react-native";
+import { ScrollView, Text, View, Image, TextInput, Alert, TouchableOpacity } from "react-native";
 import InputField from "../components/InputField";
 import { useRef, useState } from "react";
 import CustomButton from "../components/CustomButton";
@@ -10,6 +10,7 @@ import ReactNativeModal from "react-native-modal";
 
 const SignUp = () => {
     const { isLoaded, signUp, setActive } = useSignUp();
+    const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -18,12 +19,16 @@ const SignUp = () => {
     });
 
     const [verification, setVerification] = useState({
-        state: "pending",
+        state: "default",
         error: "",
         code: "",
     });
 
     const otpInputs = useRef<Array<TextInput | null>>([]);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleOTPChange = (value: string, index: number) => {
         const newCode = verification.code.split('');
@@ -57,7 +62,7 @@ const SignUp = () => {
 
             setVerification({ ...verification, state: 'pending' })
         } catch (err: any) {
-            console.error(JSON.stringify(err, null, 2))
+            Alert.alert('Error', err.errors[0].longMessage);
         }
     }
 
@@ -108,9 +113,13 @@ const SignUp = () => {
                         label="Password"
                         placeholder="Enter your password"
                         icon={icons.lock}
-                        secureTextEntry={true}
+                        secureTextEntry={!showPassword}
                         value={form.password}
                         onChangeText={(value: any) => setForm({ ...form, password: value })}
+                        rightIcon={{
+                            icon: showPassword ? icons.eyecross : icons.eye,
+                            onPress: toggleShowPassword,
+                        }}
                     />
 
                     <CustomButton onPress={onSignUpPress} className="mt-6" title={"Sign Up"} />
@@ -160,8 +169,8 @@ const SignUp = () => {
                                 />
                             ))}
                         </View>
-                        {verification.error && <Text className="text-red-500 mt-2">{verification.error}</Text>}
-                        <CustomButton title="Verify Email" onPress={onPressVerify} className="mt-8 bg-[#00CCBB]" />
+                        {verification.error && <Text className="text-red-500 text-sm mt-1">{verification.error}</Text>}
+                        <CustomButton title="Verify Email" onPress={onPressVerify} className="mt-8 bg-success-500" />
                     </View>
                 </ReactNativeModal>
 

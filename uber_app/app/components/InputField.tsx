@@ -1,10 +1,11 @@
 import { InputFieldProps } from "@/types/type";
-import { KeyboardAvoidingView, View, Text, Image, TextInput, Platform, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { KeyboardAvoidingView, View, Text, Image, TextInput, Platform, Keyboard, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
 
 const InputField = ({
     label,
     labelStyle,
     icon,
+    rightIcon,
     secureTextEntry = false,
     containerStyle,
     inputStyle,
@@ -27,6 +28,11 @@ const InputField = ({
                             secureTextEntry={secureTextEntry}
                             {...props}
                         />
+                        {rightIcon && (
+                            <TouchableOpacity onPress={rightIcon.onPress} className="mr-4">
+                                <Image source={rightIcon.icon} className={`w-6 h-6 ${iconStyle}`} />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </TouchableWithoutFeedback>

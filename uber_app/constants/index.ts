@@ -7,6 +7,7 @@ import close from "@/assets/icons/close.png";
 import dollar from "@/assets/icons/dollar.png";
 import email from "@/assets/icons/email.png";
 import eyecross from "@/assets/icons/eyecross.png";
+import eye from "@/assets/icons/eye.png";
 import google from "@/assets/icons/google.png";
 import facebook from "@/assets/icons/facebook.png";
 import home from "@/assets/icons/home.png";
@@ -54,6 +55,7 @@ export const icons = {
   dollar,
   email,
   eyecross,
+  eye,
   google,
   facebook,
   home,
