@@ -1,7 +1,7 @@
 import { icons, images } from "@/constants";
 import { ScrollView, Text, View, Image, TextInput, Alert, TouchableOpacity } from "react-native";
 import InputField from "../components/InputField";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomButton from "../components/CustomButton";
 import { Link, router } from "expo-router";
 import OAuth from "../components/OAuth";
@@ -11,6 +11,7 @@ import ReactNativeModal from "react-native-modal";
 const SignUp = () => {
     const { isLoaded, signUp, setActive } = useSignUp();
     const [showPassword, setShowPassword] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -78,7 +79,6 @@ const SignUp = () => {
                 // TODO: Create a database user!
                 await setActive({ session: completeSignUp.createdSessionId });
                 setVerification({ ...verification, state: 'success' });
-                router.replace('/')
             } else {
                 setVerification({ ...verification, state: 'failed', error: "Verification failed!" });
             }
@@ -86,6 +86,17 @@ const SignUp = () => {
             setVerification({ ...verification, state: 'failed', error: err.error[0].longMessage });
         }
     }
+
+    useEffect(() => {
+        if (showSuccessModal) {
+            const timer = setTimeout(() => {
+                setShowSuccessModal(false);
+                router.push("/(auth)/sign-in");
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showSuccessModal]);
 
     return (
         <ScrollView className="flex-1 bg-white">
@@ -135,7 +146,9 @@ const SignUp = () => {
                     </View>
                 </View>
 
-                <ReactNativeModal isVisible={verification.state === 'pending'}>
+                <ReactNativeModal
+                    isVisible={verification.state === 'pending'}
+                    onModalHide={() => setShowSuccessModal(true)}>
                     <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
                         <Text className="text-2xl text-black font-bold">Verification</Text>
                         <Text className="text-base text-gray-400 font-Jakarta mt-2">We've sent a verification code to </Text>
@@ -174,7 +187,7 @@ const SignUp = () => {
                     </View>
                 </ReactNativeModal>
 
-                <ReactNativeModal isVisible={verification.state === 'success'}>
+                <ReactNativeModal isVisible={showSuccessModal}>
                     <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
                         <Image
                             source={images.check}
