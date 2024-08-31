@@ -12,10 +12,16 @@ const SignIn = () => {
     const { signIn, setActive, isLoaded } = useSignIn();
     const router = useRouter();
 
+    const [showPassword, setShowPassword] = useState(false);
+
     const [form, setForm] = useState({
         email: "",
         password: "",
     });
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const onSignInPress = React.useCallback(async () => {
         if (!isLoaded) {
@@ -59,9 +65,13 @@ const SignIn = () => {
                         label="Password"
                         placeholder="Enter your password"
                         icon={icons.lock}
-                        secureTextEntry={true}
+                        secureTextEntry={!showPassword}
                         value={form.password}
                         onChangeText={(value: any) => setForm({ ...form, password: value })}
+                        rightIcon={{
+                            icon: showPassword ? icons.eyecross : icons.eye,
+                            onPress: toggleShowPassword,
+                        }}
                     />
 
                     <CustomButton onPress={onSignInPress} className="mt-6" title={"Sign In"} />
