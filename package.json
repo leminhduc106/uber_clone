@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "expo": "^51.0.31",
