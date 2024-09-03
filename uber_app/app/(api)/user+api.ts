@@ -1,4 +1,4 @@
-// This file is for expo API Routes.
+// This file is for expo API Routes using neon database.
 
 import { neon } from "@neondatabase/serverless";
 
