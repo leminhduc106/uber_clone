@@ -4,7 +4,7 @@ import { icons, images } from '@/constants';
 import { useUser } from '@clerk/clerk-expo'
 import { FlatList, View, Text, Image, ActivityIndicator, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
+import Map from '@/app/components/Map';
 const recentRides = [
     {
         "ride_id": "1",
@@ -111,6 +111,9 @@ export default function Page() {
     const handleSignOut = async () => {
     };
 
+    const handleDestinationPress = () => {
+    };
+
     return (
         <SafeAreaView className='bg-general-500 h-full'>
             <FlatList
@@ -147,7 +150,19 @@ export default function Page() {
                         </View>
 
                         {/* Google Text Input */}
-                        <GoogleTextInput />
+                        <GoogleTextInput
+                            icon={icons.search}
+                            containerStyle="bg-white shadow-md shadow-neutral-300"
+                            handlePress={handleDestinationPress}
+                        />
+
+                        <>
+                            <Text className='text-xl font-JakartaSemiBold mt-5 mb-3'>Your Current Location</Text>
+                            <View className='flex flex-row items-center bg-transparent h-[300px]'>
+                                <Map />
+                            </View>
+                            <Text className='text-xl font-JakartaSemiBold mt-5 mb-3'>Recent Rides</Text>
+                        </>
                     </>
                 )}
             />
