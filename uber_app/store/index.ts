@@ -1,47 +1,59 @@
-import { LocationStore } from "@/types/type";
 import { create } from "zustand";
+import { DriverStore, LocationStore, MarkerData } from "@/types/type";
 
-// Create user location store
-export const useLocationStore = create<LocationStore>(
-  (set) =>
-    ({
-      userAddress: null,
-      userLongtitude: null,
-      userLatitude: null,
-      destinationLongtitude: null,
-      destinationLatitude: null,
-      destinationAddress: null,
+export const useLocationStore = create<LocationStore>((set) => ({
+  userLatitude: null,
+  userLongitude: null,
+  userAddress: null,
+  destinationLatitude: null,
+  destinationLongitude: null,
+  destinationAddress: null,
+  setUserLocation: ({
+    latitude,
+    longitude,
+    address,
+  }: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    set(() => ({
+      userLatitude: latitude,
+      userLongitude: longitude,
+      userAddress: address,
+    }));
 
-      // Setters
-      setUserLocation: ({
-        latitude,
-        longitude,
-        address,
-      }: {
-        latitude: number;
-        longitude: number;
-        address: string;
-      }) => {
-        set(() => ({
-          userLatitude: latitude,
-          userLongtitude: longitude,
-          userAddress: address,
-        }));
-      },
-      setDestinationLocation: ({
-        latitude,
-        longitude,
-        address,
-      }: {
-        latitude: number;
-        longitude: number;
-        address: string;
-      }) => {
-        set(() => ({
-          destinationLatitude: latitude,
-          destinationLongtitude: longitude,
-          destinationAddress: address,
-        }));
-      },
-    }) as any
-);
+    // If driver is selected and now a new location is set, clear the selected driver
+    const { selectedDriver, clearSelectedDriver } = useDriverStore.getState();
+    if (selectedDriver) clearSelectedDriver();
+  },
+
+  setDestinationLocation: ({
+    latitude,
+    longitude,
+    address,
+  }: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    set(() => ({
+      destinationLatitude: latitude,
+      destinationLongitude: longitude,
+      destinationAddress: address,
+    }));
+
+    // If driver is selected and now a new location is set, clear the selected driver
+    const { selectedDriver, clearSelectedDriver } = useDriverStore.getState();
+    if (selectedDriver) clearSelectedDriver();
+  },
+}));
+
+export const useDriverStore = create<DriverStore>((set) => ({
+  drivers: [] as MarkerData[],
+  selectedDriver: null,
+  setSelectedDriver: (driverId: number) =>
+    set(() => ({ selectedDriver: driverId })),
+  setDrivers: (drivers: MarkerData[]) => set(() => ({ drivers })),
+  clearSelectedDriver: () => set(() => ({ selectedDriver: null })),
+}));
