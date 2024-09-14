@@ -5,6 +5,7 @@ import React, { useState, useCallback } from "react";
 import debounce from "lodash.debounce";
 import axios from "axios";
 
+// Use OpenStreetMap Nominatim API to fetch location suggestions instead of Google Places API due to credit card requirement
 const GoogleTextInput = ({
     icon,
     initialLocation,
@@ -42,6 +43,7 @@ const GoogleTextInput = ({
                     <Image source={icon || icons.search} className="w-5 h-5 ml-3 mt-1" resizeMode="contain" />
                 </View>
                 <TextInput
+                    autoCapitalize="none"
                     placeholder={initialLocation ?? "Where do you want to go?"}
                     placeholderTextColor="gray"
                     value={query}
