@@ -1,22 +1,39 @@
 import { useUser } from "@clerk/clerk-expo";
 import { Image, Text, View } from "react-native";
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 import { icons } from "@/constants";
 import { formatTime } from "@/lib/utils";
 import { useDriverStore, useLocationStore } from "@/store";
 import RideLayout from "../components/RideLayout";
 import Payment from "../components/Payment";
+import { useEffect, useState } from "react";
 
 const BookRide = () => {
     const { user } = useUser();
     const { userAddress, destinationAddress } = useLocationStore();
     const { drivers, selectedDriver } = useDriverStore();
+    const [publishableKey, setPublishableKey] = useState('');
 
     const driverDetails = drivers?.filter(
         (driver) => +driver.id === selectedDriver,
     )[0];
 
+    const fetchPublishableKey = async () => {
+        // const key = await fetchKey(); // fetch key from your server here
+        // setPublishableKey(key);
+      };
+    
+      useEffect(() => {
+        fetchPublishableKey();
+      }, []);
+
     return (
+        <StripeProvider
+        publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY as string} // required for Stripe payments
+        merchantIdentifier="merchant.identifier" // required for Apple Pay
+        urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+      >
         <RideLayout title="Book Ride">
             <>
                 <Text className="text-xl font-JakartaSemiBold mb-3">
@@ -90,6 +107,8 @@ const BookRide = () => {
                 <Payment />
             </>
         </RideLayout>
+        </StripeProvider>
+
     );
 };
 

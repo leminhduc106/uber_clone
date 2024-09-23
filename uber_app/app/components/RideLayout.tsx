@@ -3,10 +3,9 @@ import { router } from "expo-router";
 import { Text, TouchableOpacity, View, Image } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Map from "./Map";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 
-// Quick Note: The diffence between layout components and regular components is that layout typically accept children as props.
 const RideLayout = ({ children, title, snapPoints }: { children: React.ReactNode, title: string, snapPoints?: string[] }) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -14,8 +13,7 @@ const RideLayout = ({ children, title, snapPoints }: { children: React.ReactNode
         <GestureHandlerRootView>
             <View className="flex-1 bg-white">
                 <View className="flex flex-col h-screen bg-blue-500">
-                    <View className="flex flex-row absolute z-10 top-16
-                    items-center justify-start px-5">
+                    <View className="flex flex-row absolute z-10 top-16 items-center justify-start px-5">
                         <TouchableOpacity onPress={() => router.back()}>
                             <View className="w-10 h-10 bg-white rounded-full items-center justify-center">
                                 <Image

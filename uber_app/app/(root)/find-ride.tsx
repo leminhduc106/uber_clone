@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 
 const FindRide = () => {
     const { userAddress, destinationAddress, setUserLocation, setDestinationLocation } = useLocationStore();
+    
     return (
         <RideLayout title='Ride' snapPoints={['85%']}>
             <View className='my-3'>
