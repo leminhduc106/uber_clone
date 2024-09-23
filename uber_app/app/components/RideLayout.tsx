@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { Text, TouchableOpacity, View, Image } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Map from "./Map";
-import BottomSheet, { BottomSheetView, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 
 const RideLayout = ({ children, title, snapPoints }: { children: React.ReactNode, title: string, snapPoints?: string[] }) => {
